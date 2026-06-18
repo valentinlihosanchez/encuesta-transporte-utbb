@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Acceso admin - Encuesta UTBB</title>
+  <link rel="stylesheet" href="/static/css/admin.css" />
+</head>
+<body>
+  <div class="login-wrap">
+    <form class="login-card" method="POST" action="/coordinacion-utbb/login">
+      <div class="logo">UTBB</div>
+      <h1>Panel de administracion</h1>
+      <p class="sub">Encuesta de Transporte Universitario</p>
+      <% if (error) { %><div class="login-error"><%= error %></div><% } %>
+      <div class="campo">
+        <label for="usuario">Usuario</label>
+        <input type="text" id="usuario" name="usuario" autocomplete="username" autofocus required />
+      </div>
+      <div class="campo">
+        <label for="password">Contrasena</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" required />
+      </div>
+      <button type="submit" class="btn btn-primario">Entrar</button>
+    </form>
+  </div>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detalle - Admin UTBB</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="/static/css/admin.css" />
+</head>
+<body>
+  <%- include('../partials/admin_top', { activo: activo, adminUser: adminUser }) %>
+  <div class="wrap">
+    <a href="javascript:history.back()" class="btn btn-sec" style="margin-bottom:14px;">&laquo; Volver</a>
+    <h1 class="titulo"><%= est.nombre_completo %></h1>
+
+    <div class="detalle-grid">
+      <div>
+        <div class="card">
+          <h2>Datos del estudiante</h2>
+          <div class="dato"><span class="k">Matricula</span><span class="v"><%= est.matricula %></span></div>
+          <div class="dato"><span class="k">Correo</span><span class="v"><%= est.correo %></span></div>
+          <div class="dato"><span class="k">Carrera</span><span class="v"><%= est.carrera %></span></div>
+          <div class="dato"><span class="k">Cuatrimestre</span><span class="v"><%= est.cuatrimestre %>&deg;</span></div>
+          <div class="dato"><span class="k">Grupo</span><span class="v"><%= est.grupo %></span></div>
+          <div class="dato"><span class="k">Registrado</span><span class="v"><%= new Date(est.creado_en).toLocaleString('es-MX') %></span></div>
+        </div>
+
+        <% if (transporte) { %>
+        <div class="card">
+          <h2>Como llega</h2>
+          <div class="dato"><span class="k">Medio</span><span class="v"><%= transporte.medio_transporte.replace('_',' ') %><%= transporte.medio_transporte_otro ? ' ('+transporte.medio_transporte_otro+')' : '' %></span></div>
+          <% if (transporte.vive_direccion) { %><div class="dato"><span class="k">Domicilio</span><span class="v"><%= transporte.vive_direccion %></span></div><% } %>
+          <% if (transporte.medio_transporte === 'camion') { %>
+            <div class="dato"><span class="k">Transborda</span><span class="v"><%= transporte.transborda ? 'Si' : 'No' %></span></div>
+          <% } %>
+          <div class="dato"><span class="k">Usaria ruta oficial</span><span class="v"><%= transporte.usaria_ruta_oficial || 'Sin respuesta' %></span></div>
+        </div>
+        <% } %>
+
+        <% if (entradas && entradas.length) { %>
+        <div class="card">
+          <h2>Horarios de entrada</h2>
+          <% entradas.forEach(function(h){ %>
+            <div class="dato">
+              <span class="k" style="text-transform:capitalize;"><%= h.dia_semana %></span>
+              <span class="v"><%= h.no_aplica ? 'No aplica' : (h.hora_entrada ? h.hora_entrada.slice(0,5) : '-') %></span>
+            </div>
+          <% }) %>
+        </div>
+        <% } %>
+
+        <% if (horarios && horarios.length) { %>
+        <div class="card">
+          <h2>Horarios de salida</h2>
+          <% horarios.forEach(function(h){ %>
+            <div class="dato">
+              <span class="k" style="text-transform:capitalize;"><%= h.dia_semana %></span>
+              <span class="v"><%= h.no_aplica ? 'No aplica' : (h.hora_salida ? h.hora_salida.slice(0,5) : '-') %></span>
+            </div>
+          <% }) %>
+        </div>
+        <% } %>
+      </div>
+
+      <div>
+        <div class="card">
+          <h2>Ubicaciones</h2>
+          <div id="miniMapa" class="mini-mapa"></div>
+          <p class="muted" style="font-size:.82rem;margin:10px 0 0;" id="leyendaMapa"></p>
+        </div>
+        <div class="card">
+          <h2>Acciones</h2>
+          <button class="btn btn-peligro" id="btnEliminar" data-id="<%= est.id %>">Eliminar este registro</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+    var UTBB = { lat: <%= utbb.lat %>, lng: <%= utbb.lng %> };
+    var puntos = [];
+    <% if (transporte) { %>
+      <% if (transporte.vive_lat) { %>puntos.push({lat:<%= transporte.vive_lat %>,lng:<%= transporte.vive_lng %>,label:'Domicilio',color:'#5e35b1'});<% } %>
+      <% if (transporte.parada_camion_lat) { %>puntos.push({lat:<%= transporte.parada_camion_lat %>,lng:<%= transporte.parada_camion_lng %>,label:'Parada de camion',color:'#1565c0'});<% } %>
+      <% if (transporte.segunda_parada_lat) { %>puntos.push({lat:<%= transporte.segunda_parada_lat %>,lng:<%= transporte.segunda_parada_lng %>,label:'Segunda parada',color:'#e65100'});<% } %>
+    <% } %>
+
+    var map = L.map('miniMapa').setView([UTBB.lat, UTBB.lng], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
+    L.circleMarker([UTBB.lat, UTBB.lng], { radius:9, color:'#1b7a3d', fillColor:'#1b7a3d', fillOpacity:1 }).addTo(map).bindPopup('UTBB');
+
+    var grupo = [[UTBB.lat, UTBB.lng]];
+    puntos.forEach(function(p){
+      L.circleMarker([p.lat,p.lng], { radius:9, color:p.color, fillColor:p.color, fillOpacity:.9 }).addTo(map).bindPopup(p.label);
+      grupo.push([p.lat,p.lng]);
+    });
+    if (grupo.length > 1) map.fitBounds(grupo, { padding:[40,40] });
+    document.getElementById('leyendaMapa').textContent = puntos.length
+      ? 'Verde = UTBB. ' + puntos.map(function(p){return p.label;}).join(', ') + '.'
+      : 'Este estudiante no marco ubicaciones en el mapa.';
+
+    document.getElementById('btnEliminar').addEventListener('click', function(){
+      if (!confirm('Seguro que deseas eliminar este registro? Esta accion no se puede deshacer.')) return;
+      fetch('/coordinacion-utbb/estudiante/' + this.dataset.id, { method:'DELETE', headers:{'Accept':'application/json'} })
+        .then(function(r){ return r.json(); })
+        .then(function(j){ if (j.ok) { alert('Registro eliminado.'); location.href='/coordinacion-utbb'; } else { alert('No se pudo eliminar.'); } })
+        .catch(function(){ alert('Error al eliminar.'); });
+    });
+  </script>
+</body>
+</html>

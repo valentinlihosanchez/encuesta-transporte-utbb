@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Admin UTBB</title>
+  <link rel="stylesheet" href="/static/css/admin.css" />
+</head>
+<body>
+  <%- include('../partials/admin_top', { activo: activo, adminUser: adminUser }) %>
+  <div class="wrap">
+    <h1 class="titulo">Dashboard</h1>
+
+    <div class="kpis">
+      <div class="kpi"><div class="n" id="kpiTotal">-</div><div class="l">Estudiantes encuestados</div></div>
+      <div class="kpi"><div class="n" id="kpiCamion">-</div><div class="l">Usan camion</div></div>
+      <div class="kpi"><div class="n" id="kpiTransbordo">-</div><div class="l">Transbordan</div></div>
+      <div class="kpi"><div class="n" id="kpiRutaSi">-</div><div class="l">Usarian la ruta oficial (Si)</div></div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card"><h2>Distribucion de horas de entrada</h2><canvas id="chHoras"></canvas></div>
+      <div class="chart-card"><h2>Medio de transporte</h2><canvas id="chMedios"></canvas></div>
+      <div class="chart-card"><h2>Transbordos (solo camion)</h2><canvas id="chTransbordo"></canvas></div>
+      <div class="chart-card"><h2>&iquest;Usarian la ruta oficial?</h2><canvas id="chRuta"></canvas></div>
+      <div class="chart-card" style="grid-column:1/-1;"><h2>Horarios de salida por dia</h2><canvas id="chSalidas" style="max-height:360px;"></canvas></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="/static/js/admin_dashboard.js"></script>
+</body>
+</html>

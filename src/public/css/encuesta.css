@@ -1,0 +1,422 @@
+:root {
+  --verde: #1b7a3d;
+  --verde-osc: #14592d;
+  --verde-claro: #e7f3ec;
+  --verde-acento: #2e7d32;
+  --gris-txt: #2b2b2b;
+  --gris-suave: #6b7280;
+  --borde: #d7dee2;
+  --error: #c0392b;
+  --error-bg: #fdecea;
+  --blanco: #ffffff;
+  --radio: 12px;
+  --sombra: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--blanco);
+  color: var(--gris-txt);
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ---------- Encabezado ---------- */
+.app-header {
+  background: var(--verde);
+  color: #fff;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: var(--sombra);
+}
+.app-header .logo {
+  width: 40px; height: 40px;
+  background: #fff;
+  color: var(--verde);
+  font-weight: 800;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  flex: 0 0 auto;
+}
+.app-header h1 {
+  font-size: 1rem;
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+/* ---------- Barra de progreso ---------- */
+.progreso-wrap {
+  padding: 14px 16px 4px;
+  background: #fff;
+}
+.progreso-pasos {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.paso-num {
+  flex: 1;
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--gris-suave);
+  position: relative;
+}
+.paso-num .bola {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: #e6eaec;
+  color: var(--gris-suave);
+  display: grid; place-items: center;
+  margin: 0 auto 4px;
+  font-weight: 700;
+  transition: all .2s;
+}
+.paso-num.activo .bola { background: var(--verde); color: #fff; }
+.paso-num.completo .bola { background: var(--verde-acento); color: #fff; }
+.progreso-barra {
+  height: 8px;
+  background: #e6eaec;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progreso-barra > span {
+  display: block;
+  height: 100%;
+  width: 25%;
+  background: linear-gradient(90deg, var(--verde), var(--verde-acento));
+  transition: width .3s ease;
+}
+
+/* ---------- Contenedor / tarjetas ---------- */
+.contenedor {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 16px;
+}
+.paso { display: none; }
+.paso.activo { display: block; animation: fade .25s ease; }
+@keyframes fade { from { opacity: 0; transform: translateY(6px);} to {opacity:1; transform:none;} }
+
+.paso h2 {
+  font-size: 1.15rem;
+  color: var(--verde-osc);
+  margin: 4px 0 2px;
+}
+.paso .subtitulo {
+  color: var(--gris-suave);
+  font-size: 0.9rem;
+  margin: 0 0 14px;
+}
+
+/* ---------- Campos ---------- */
+.campo { margin-bottom: 16px; }
+.campo > label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.92rem;
+  margin-bottom: 6px;
+}
+.campo .opcional { color: var(--gris-suave); font-weight: 400; }
+.campo input[type="text"],
+.campo input[type="email"],
+.campo input[type="search"],
+.campo select {
+  width: 100%;
+  padding: 13px 12px;
+  font-size: 1rem;
+  border: 1.5px solid var(--borde);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--gris-txt);
+  appearance: none;
+}
+.campo input:focus,
+.campo select:focus {
+  outline: none;
+  border-color: var(--verde);
+  box-shadow: 0 0 0 3px rgba(27, 122, 61, 0.15);
+}
+.campo select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%231b7a3d' stroke-width='2.5'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+.ayuda { font-size: 0.8rem; color: var(--gris-suave); margin-top: 4px; }
+.campo.invalido input,
+.campo.invalido select { border-color: var(--error); }
+.campo .msg-error {
+  display: none;
+  color: var(--error);
+  font-size: 0.82rem;
+  margin-top: 5px;
+}
+.campo.invalido .msg-error { display: block; }
+
+/* ---------- Opciones tipo tarjeta (radios) ---------- */
+.opciones { display: grid; gap: 10px; }
+.opcion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1.5px solid var(--borde);
+  border-radius: 12px;
+  padding: 14px 14px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.opcion input { accent-color: var(--verde); width: 20px; height: 20px; flex: 0 0 auto; }
+.opcion:hover { border-color: var(--verde); }
+.opcion.sel { border-color: var(--verde); background: var(--verde-claro); }
+.opcion .txt { font-size: 0.95rem; }
+.opcion .txt small { display: block; color: var(--gris-suave); font-weight: 400; }
+
+/* ---------- Mapa ---------- */
+.mapa-box { margin-top: 8px; }
+.mapa {
+  width: 100%;
+  height: 280px;
+  border-radius: 12px;
+  border: 1.5px solid var(--borde);
+  z-index: 0;
+}
+.mapa-buscar { display: flex; gap: 8px; margin-bottom: 8px; }
+.mapa-buscar input { flex: 1; }
+.mapa-buscar button { flex: 0 0 auto; }
+.mapa-coords {
+  font-size: 0.82rem; color: var(--gris-suave);
+  margin-top: 6px;
+}
+.mapa-coords.ok { color: var(--verde-acento); font-weight: 600; }
+
+/* ---------- Horarios por dia ---------- */
+.dia-row {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #eef1f3;
+}
+.dia-row .dia-nombre { font-weight: 600; text-transform: capitalize; }
+.dia-row .noaplica {
+  grid-column: 1 / -1;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.85rem; color: var(--gris-suave);
+}
+.dia-row select:disabled { background: #f0f2f4; color: #aab; }
+
+/* ---------- Hora de entrada por dia (barras verticales en columnas) ---------- */
+.entrada-dias {
+  display: flex;
+  gap: 5px;
+  margin-top: 10px;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px;
+}
+.entrada-col {
+  flex: 1 1 0;
+  min-width: 0;               /* permite que las 5 columnas quepan sin scroll */
+  border: 1.5px solid var(--borde);
+  border-radius: 12px;
+  padding: 9px 3px 7px;
+  text-align: center;
+  background: #fff;
+}
+.entrada-col .dia {
+  font-weight: 700; font-size: .76rem; text-transform: capitalize;
+  margin-bottom: 5px; color: var(--verde-osc);
+}
+.entrada-col .hora-val {
+  font-weight: 800; font-size: .74rem; color: var(--verde-acento);
+  min-height: 1.1em; margin-bottom: 7px; white-space: nowrap;
+  transition: transform .12s ease;
+}
+.entrada-col .hora-val.pop { animation: popVal .22s ease; }
+@keyframes popVal {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}
+
+/* Barra ancha tipo "termometro": pista gris + relleno verde que sube. */
+.entrada-col .barra {
+  --pct: 0%;
+  position: relative;
+  width: 28px;
+  max-width: 100%;
+  height: 150px;
+  margin: 0 auto;
+  border-radius: 999px;
+  background: #e6eaec;            /* pista vacia */
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.12);
+  overflow: hidden;
+  touch-action: none;            /* arrastre vertical fluido en movil */
+}
+.entrada-col .barra-fill {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: var(--pct);
+  background: linear-gradient(180deg, var(--verde-acento), var(--verde));
+  border-radius: 999px;
+  transition: height .18s cubic-bezier(.34,1.4,.5,1);  /* animacion al subir */
+}
+/* Asa plana (sin circulito): una franja blanca sobre el tope del relleno. */
+.entrada-col .barra-handle {
+  position: absolute;
+  left: 3px; right: 3px;
+  height: 6px;
+  bottom: var(--pct);
+  margin-bottom: -3px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,.3);
+  transition: bottom .18s cubic-bezier(.34,1.4,.5,1);
+  pointer-events: none;
+}
+/* Input nativo: transparente y encima de toda la barra para capturar el arrastre.
+   El thumb se hace grande pero invisible (sin circulito visible). */
+.entrada-col .barra input[type="range"].vert {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  writing-mode: vertical-lr;
+  direction: rtl;                       /* min abajo, max arriba */
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  opacity: 0;                           /* oculta el thumb/circulo nativo */
+  cursor: pointer;
+}
+.entrada-col .barra input[type="range"].vert::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 34px; height: 34px;            /* area de agarre amplia (invisible) */
+}
+.entrada-col .barra input[type="range"].vert::-moz-range-thumb {
+  width: 34px; height: 34px; border: none; background: transparent;
+}
+
+.entrada-col .noap {
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  font-size: .72rem; color: var(--gris-suave); margin-top: 10px;
+}
+.entrada-col .noap input { accent-color: var(--verde); width: 16px; height: 16px; }
+.entrada-col.inactiva { background: #f0f2f4; }
+.entrada-col.inactiva .barra { opacity: .4; }
+.entrada-col.inactiva .barra input[type="range"] { pointer-events: none; }
+.entrada-col.inactiva .hora-val { color: var(--gris-suave); }
+
+/* ---------- Aviso carro personal ---------- */
+.aviso-carro {
+  background: var(--verde-claro);
+  border: 1.5px solid var(--verde);
+  border-radius: 14px;
+  padding: 22px 18px;
+  text-align: center;
+  margin: 6px 0 4px;
+}
+.aviso-carro .aviso-icono { font-size: 40px; line-height: 1; }
+.aviso-carro h3 { color: var(--verde-osc); margin: 8px 0; font-size: 1.05rem; }
+.aviso-carro p { color: var(--gris-txt); font-size: .92rem; margin: 0; }
+
+/* ---------- Botones ---------- */
+.acciones {
+  display: flex;
+  gap: 10px;
+  margin-top: 22px;
+}
+.btn {
+  flex: 1;
+  padding: 15px 16px;
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.btn-primario { background: var(--verde); color: #fff; }
+.btn-primario:hover { background: var(--verde-osc); }
+.btn-primario:disabled { opacity: .6; cursor: not-allowed; }
+.btn-sec {
+  background: #fff;
+  color: var(--verde-osc);
+  border: 1.5px solid var(--borde);
+  flex: 0 0 auto;
+  min-width: 110px;
+}
+.btn-sec:hover { border-color: var(--verde); }
+.btn-mini {
+  padding: 12px 14px; font-size: .9rem; border-radius: 10px;
+  background: var(--verde); color:#fff; border:none; cursor:pointer; font-weight:600;
+}
+
+/* ---------- Resumen ---------- */
+.resumen-grupo {
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+.resumen-grupo h3 {
+  margin: 0 0 8px; font-size: .95rem; color: var(--verde-osc);
+}
+.resumen-item {
+  display: flex; justify-content: space-between; gap: 12px;
+  padding: 4px 0; font-size: .9rem;
+  border-bottom: 1px dashed #eef1f3;
+}
+.resumen-item:last-child { border-bottom: none; }
+.resumen-item .k { color: var(--gris-suave); }
+.resumen-item .v { font-weight: 600; text-align: right; }
+
+/* ---------- Banner de error global ---------- */
+.banner-error {
+  display: none;
+  background: var(--error-bg);
+  color: var(--error);
+  border: 1px solid #f5c6c0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  font-size: .9rem;
+}
+.banner-error.show { display: block; }
+.banner-error ul { margin: 6px 0 0; padding-left: 18px; }
+
+/* ---------- Pantalla final ---------- */
+.gracias {
+  text-align: center;
+  padding: 40px 20px;
+}
+.gracias .check {
+  width: 76px; height: 76px; border-radius: 50%;
+  background: var(--verde-claro); color: var(--verde);
+  display: grid; place-items: center; margin: 0 auto 18px;
+  font-size: 40px;
+}
+.gracias h2 { color: var(--verde-osc); }
+
+.oculto { display: none !important; }
+
+/* ---------- Pantallas grandes ---------- */
+@media (min-width: 700px) {
+  .app-header h1 { font-size: 1.15rem; }
+  .mapa { height: 340px; }
+}

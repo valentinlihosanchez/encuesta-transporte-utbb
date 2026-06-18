@@ -1,0 +1,12 @@
+<div class="topbar">
+  <div class="brand"><span class="logo">UTBB</span> <span>Encuesta de Transporte</span></div>
+  <nav>
+    <a href="/coordinacion-utbb" class="<%= activo === 'listado' ? 'activo' : '' %>">Respuestas</a>
+    <a href="/coordinacion-utbb/dashboard" class="<%= activo === 'dashboard' ? 'activo' : '' %>">Dashboard</a>
+    <a href="/coordinacion-utbb/mapa" class="<%= activo === 'mapa' ? 'activo' : '' %>">Mapa general</a>
+  </nav>
+  <span class="user">Sesion: <strong><%= adminUser %></strong></span>
+  <form method="POST" action="/coordinacion-utbb/logout" style="margin:0;">
+    <button class="salir" type="submit">Salir</button>
+  </form>
+</div>

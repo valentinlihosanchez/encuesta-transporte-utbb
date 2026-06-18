@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Respuestas - Admin UTBB</title>
+  <link rel="stylesheet" href="/static/css/admin.css" />
+</head>
+<body>
+  <%- include('../partials/admin_top', { activo: activo, adminUser: adminUser }) %>
+  <div class="wrap">
+    <h1 class="titulo">Respuestas de la encuesta</h1>
+
+    <div class="kpis">
+      <div class="kpi"><div class="n"><%= total %></div><div class="l">Resultados con el filtro actual</div></div>
+    </div>
+
+    <form class="filtros" method="GET" action="/coordinacion-utbb">
+      <div class="f">
+        <label>Buscar (nombre / matricula)</label>
+        <input type="text" name="buscar" value="<%= filtros.buscar || '' %>" placeholder="Nombre o matricula" />
+      </div>
+      <div class="f">
+        <label>Carrera</label>
+        <select name="carrera">
+          <option value="">Todas</option>
+          <% cfg.CARRERAS_VALIDAS.forEach(function(c){ %>
+            <option value="<%= c %>" <%= filtros.carrera === c ? 'selected' : '' %>><%= c %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="f">
+        <label>Cuatrimestre</label>
+        <select name="cuatrimestre">
+          <option value="">Todos</option>
+          <% cfg.CUATRIMESTRES.forEach(function(c){ %>
+            <option value="<%= c %>" <%= filtros.cuatrimestre === c ? 'selected' : '' %>><%= c %>&deg;</option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="f">
+        <label>Grupo</label>
+        <input type="text" name="grupo" value="<%= filtros.grupo || '' %>" placeholder="Ej. A" />
+      </div>
+      <div class="f">
+        <label>Medio de transporte</label>
+        <select name="medio">
+          <option value="">Todos</option>
+          <option value="camion" <%= filtros.medio === 'camion' ? 'selected':'' %>>Camion</option>
+          <option value="carro_personal" <%= filtros.medio === 'carro_personal' ? 'selected':'' %>>Carro personal</option>
+          <option value="otro" <%= filtros.medio === 'otro' ? 'selected':'' %>>Otro</option>
+        </select>
+      </div>
+      <div class="f">
+        <label>Desde</label>
+        <input type="date" name="desde" value="<%= filtros.desde || '' %>" />
+      </div>
+      <div class="f">
+        <label>Hasta</label>
+        <input type="date" name="hasta" value="<%= filtros.hasta || '' %>" />
+      </div>
+      <div class="f acciones-f">
+        <button type="submit" class="btn btn-primario">Filtrar</button>
+        <a href="/coordinacion-utbb" class="btn btn-sec">Limpiar</a>
+      </div>
+    </form>
+
+    <div style="margin-bottom:12px;">
+      <a class="btn btn-primario" href="/coordinacion-utbb/export.csv?<%= new URLSearchParams(filtros).toString() %>">&#8595; Exportar CSV</a>
+    </div>
+
+    <% if (rows.length === 0) { %>
+      <div class="tabla-wrap"><div class="vacio">No hay respuestas con el filtro actual.</div></div>
+    <% } else { %>
+    <div class="tabla-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Nombre</th><th>Matricula</th><th>Carrera</th>
+            <th>Cuat.</th><th>Grupo</th><th>Medio</th><th>Entrada lun</th>
+            <th>Transb.</th><th>Ruta?</th><th>Fecha</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% rows.forEach(function(r){ %>
+          <tr>
+            <td><%= r.id %></td>
+            <td><%= r.nombre_completo %></td>
+            <td><%= r.matricula %></td>
+            <td><%= r.carrera %></td>
+            <td><%= r.cuatrimestre %>&deg;</td>
+            <td><%= r.grupo %></td>
+            <td><% if (r.medio_transporte) { %><span class="badge <%= r.medio_transporte %>"><%= r.medio_transporte.replace('_',' ') %></span><% } else { %><span class="muted">-</span><% } %></td>
+            <td><%= r.hora_entrada_lunes ? r.hora_entrada_lunes : '-' %></td>
+            <td><%= r.transborda ? 'Si' : 'No' %></td>
+            <td class="muted"><%= r.usaria_ruta_oficial || '-' %></td>
+            <td class="muted"><%= new Date(r.creado_en).toLocaleString('es-MX') %></td>
+            <td><a href="/coordinacion-utbb/detalle/<%= r.id %>" class="btn btn-sec" style="padding:5px 10px;">Ver</a></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <% function pageUrl(p){ var q = Object.assign({}, filtros); q.page = p; return '/admin?' + new URLSearchParams(q).toString(); } %>
+    <div class="paginacion">
+      <% if (page > 1) { %><a href="<%= pageUrl(page-1) %>">&laquo; Anterior</a><% } else { %><span class="disabled">&laquo; Anterior</span><% } %>
+      <span class="actual">Pagina <%= page %> de <%= totalPages %></span>
+      <% if (page < totalPages) { %><a href="<%= pageUrl(page+1) %>">Siguiente &raquo;</a><% } else { %><span class="disabled">Siguiente &raquo;</span><% } %>
+    </div>
+    <% } %>
+  </div>
+</body>
+</html>

@@ -1,0 +1,9 @@
+node_modules/
+.env
+npm-debug.log*
+*.log
+server.log
+err.txt
+.DS_Store
+pgdata/
+screenshots/

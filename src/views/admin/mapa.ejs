@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mapa general - Admin UTBB</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <link rel="stylesheet" href="/static/css/admin.css" />
+</head>
+<body>
+  <%- include('../partials/admin_top', { activo: activo, adminUser: adminUser }) %>
+  <div class="wrap">
+    <h1 class="titulo">Mapa general de ubicaciones</h1>
+    <p class="muted" style="margin-top:-8px;">Usa el panel de la izquierda para elegir que ubicaciones mostrar. Los puntos cercanos se agrupan para ver las zonas con mas estudiantes.</p>
+
+    <div class="mapa-layout">
+      <aside class="mapa-side">
+        <h3>Mostrar en el mapa</h3>
+
+        <label class="capa" data-tipo="domicilio">
+          <input type="checkbox" checked />
+          <span class="punto" style="background:#5e35b1;"></span>
+          <span class="capa-txt">Donde viven</span>
+          <span class="capa-num" data-num="domicilio">0</span>
+        </label>
+
+        <label class="capa" data-tipo="parada">
+          <input type="checkbox" checked />
+          <span class="punto" style="background:#1565c0;"></span>
+          <span class="capa-txt">Donde toman el camion</span>
+          <span class="capa-num" data-num="parada">0</span>
+        </label>
+
+        <label class="capa" data-tipo="segunda">
+          <input type="checkbox" checked />
+          <span class="punto" style="background:#e65100;"></span>
+          <span class="capa-txt">Donde toman el 2&deg; camion</span>
+          <span class="capa-num" data-num="segunda">0</span>
+        </label>
+
+        <div class="capa-sep"></div>
+        <div class="capa-total">
+          <span>Total de puntos</span>
+          <strong id="totalPuntos">0</strong>
+        </div>
+        <p class="muted" style="font-size:.78rem;margin:10px 0 0;">El numero a la derecha de cada tipo es cuantos estudiantes marcaron esa ubicacion.</p>
+      </aside>
+
+      <div id="mapaGeneral" class="mapa-full"></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script src="/static/js/admin_mapa.js"></script>
+</body>
+</html>

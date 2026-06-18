@@ -1,0 +1,42 @@
+{
+  "name": "encuesta-transporte-utbb",
+  "version": "1.0.0",
+  "description": "Encuesta de transporte universitario UTBB + panel de administración",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "migrate": "node scripts/migrate.js",
+    "seed:admin": "node scripts/createAdmin.js",
+    "seed:demo": "node scripts/seedDemo.js",
+    "test:e2e": "node scripts/e2e.js",
+    "test:browser": "node scripts/browserTest.js"
+  },
+  "keywords": [
+    "utbb",
+    "encuesta",
+    "transporte",
+    "express",
+    "postgresql"
+  ],
+  "author": "UTBB",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "connect-pg-simple": "^9.0.1",
+    "csv-stringify": "^6.5.1",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "express-session": "^1.18.0",
+    "pg": "^8.12.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}

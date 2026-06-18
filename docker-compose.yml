@@ -1,0 +1,24 @@
+services:
+  db:
+    image: postgres:16
+    container_name: utbb_encuesta_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: utbb
+      POSTGRES_PASSWORD: utbb
+      POSTGRES_DB: encuesta_transporte
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Las migraciones de este directorio se ejecutan automaticamente al
+      # crear el contenedor por primera vez (orden alfabetico).
+      - ./migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U utbb -d encuesta_transporte"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:

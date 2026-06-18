@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Encuesta de Transporte Universitario UTBB</title>
+  <meta name="description" content="Encuesta de transporte para estudiantes de la UTBB" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="/static/css/encuesta.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="logo">UTBB</div>
+    <h1>Encuesta de Transporte Universitario</h1>
+  </header>
+
+  <div class="progreso-wrap">
+    <div class="progreso-pasos" id="progresoPasos">
+      <div class="paso-num activo" data-paso="1"><div class="bola">1</div>Registro</div>
+      <div class="paso-num" data-paso="2"><div class="bola">2</div>Llegada</div>
+      <div class="paso-num" data-paso="3"><div class="bola">3</div>Salidas</div>
+      <div class="paso-num" data-paso="4"><div class="bola">4</div>Confirmar</div>
+    </div>
+    <div class="progreso-barra"><span id="progresoBarra"></span></div>
+  </div>
+
+  <main class="contenedor">
+    <div class="banner-error" id="bannerError"></div>
+    <form id="formEncuesta" novalidate>
+
+      <!-- ============ PASO 1: REGISTRO ============ -->
+      <section class="paso activo" data-paso="1">
+        <h2>Registro del estudiante</h2>
+        <p class="subtitulo">Cuentanos quien eres. Todos los campos son obligatorios.</p>
+
+        <div class="campo" data-field="nombre_completo">
+          <label for="nombre_completo">Nombre completo</label>
+          <input type="text" id="nombre_completo" name="nombre_completo" autocomplete="name" maxlength="150" />
+          <div class="msg-error">Escribe tu nombre completo.</div>
+        </div>
+
+        <div class="campo" data-field="matricula">
+          <label for="matricula">Matricula</label>
+          <input type="text" id="matricula" name="matricula" inputmode="numeric" maxlength="30" />
+          <div class="msg-error">Escribe tu matricula.</div>
+        </div>
+
+        <div class="campo" data-field="correo">
+          <label for="correo">Correo institucional</label>
+          <input type="email" id="correo" name="correo" autocomplete="email"
+                 placeholder="usuario@academica.utbb.edu.mx" maxlength="150" />
+          <div class="ayuda">Debe terminar en <strong>@academica.utbb.edu.mx</strong></div>
+          <div class="msg-error">Ingresa un correo institucional valido (@academica.utbb.edu.mx).</div>
+        </div>
+
+        <div class="campo" data-field="carrera">
+          <label for="carrera">Carrera</label>
+          <select id="carrera" name="carrera"><option value="">Selecciona tu carrera...</option></select>
+          <div class="msg-error">Selecciona tu carrera.</div>
+        </div>
+
+        <div class="campo" data-field="cuatrimestre">
+          <label for="cuatrimestre">Cuatrimestre</label>
+          <select id="cuatrimestre" name="cuatrimestre"><option value="">Selecciona...</option></select>
+          <div class="msg-error">Selecciona tu cuatrimestre.</div>
+        </div>
+
+        <div class="campo" data-field="grupo">
+          <label for="grupo">Grupo</label>
+          <input type="text" id="grupo" name="grupo" maxlength="20" placeholder="Ej. A, B, 101" />
+          <div class="msg-error">Escribe tu grupo.</div>
+        </div>
+
+        <div class="acciones">
+          <button type="button" class="btn btn-primario" data-next>Continuar</button>
+        </div>
+      </section>
+
+      <!-- ============ PASO 2: LLEGADA ============ -->
+      <section class="paso" data-paso="2">
+        <h2>Como llegas a la universidad</h2>
+        <p class="subtitulo">Esta informacion nos ayuda a disenar la ruta.</p>
+
+        <div class="campo" data-field="medio_transporte">
+          <label>Medio de transporte principal</label>
+          <div class="opciones" id="opcMedio">
+            <label class="opcion"><input type="radio" name="medio_transporte" value="camion" />
+              <span class="txt">Camion / transporte publico</span></label>
+            <label class="opcion"><input type="radio" name="medio_transporte" value="carro_personal" />
+              <span class="txt">Carro personal</span></label>
+            <label class="opcion"><input type="radio" name="medio_transporte" value="otro" />
+              <span class="txt">Otro <small>caminando, motocicleta, bicicleta...</small></span></label>
+          </div>
+          <div class="msg-error">Selecciona como llegas.</div>
+        </div>
+
+        <div class="campo oculto" data-field="medio_transporte_otro" id="campoOtro">
+          <label for="medio_transporte_otro">Especifica cual</label>
+          <input type="text" id="medio_transporte_otro" name="medio_transporte_otro" maxlength="100"
+                 placeholder="Ej. bicicleta, motocicleta, caminando" />
+          <div class="msg-error">Especifica tu medio de transporte.</div>
+        </div>
+
+        <!-- Mensaje para quienes usan carro personal: la encuesta es para usuarios
+             del transporte oficial, asi que se bloquea el resto. -->
+        <div class="aviso-carro oculto" id="mensajeCarro">
+          <div class="aviso-icono">&#128663;</div>
+          <h3>Esta encuesta es para el transporte oficial UTBB</h3>
+          <p>Esta encuesta esta dirigida a estudiantes que <strong>usarian la ruta oficial
+          de transporte de la UTBB</strong>. Como te trasladas en carro personal, no
+          necesitas responder el resto. Registramos tu respuesta para saber cuantos
+          estudiantes llegan en carro propio. &iexcl;Gracias por participar!</p>
+        </div>
+
+        <!-- Bloque para quienes usan o usarian el transporte (camion u otro) -->
+        <div id="bloqueLlegada" class="oculto">
+
+        <div class="campo" data-field="horarios_entrada">
+          <label>Hora de entrada a la universidad (de lunes a viernes)</label>
+          <div class="ayuda">Desliza la barra de cada dia para elegir tu hora de entrada. Si no asistes ese dia, marca "No aplica".</div>
+          <div class="entrada-dias" id="entradaDiasContenedor"></div>
+          <div class="msg-error">Indica tu hora de entrada o marca "no aplica" en cada dia.</div>
+        </div>
+
+        <div class="campo" data-field="vive_direccion">
+          <label for="vive_direccion">Donde vives <span class="opcional">(opcional)</span></label>
+          <input type="text" id="vive_direccion" name="vive_direccion" maxlength="300"
+                 list="listaColonias" autocomplete="off"
+                 placeholder="Escribe o elige tu colonia / zona aproximada" />
+          <datalist id="listaColonias"></datalist>
+          <div class="ayuda">Empieza a escribir y elige de la lista; si no aparece, escribe tu colonia. Solo es una zona aproximada. Opcional: marcala tambien en el mapa.</div>
+          <div class="mapa-box">
+            <div class="mapa-buscar">
+              <input type="search" id="buscarDomicilio" placeholder="Buscar direccion..." />
+              <button type="button" class="btn-mini" id="btnBuscarDomicilio">Buscar</button>
+            </div>
+            <div class="mapa" id="mapaDomicilio"></div>
+            <div class="mapa-coords" id="coordsDomicilio">Sin ubicacion marcada.</div>
+          </div>
+        </div>
+
+        <!-- Solo si elige camion -->
+        <div id="bloqueCamion" class="oculto">
+          <!-- 1) Transbordo -->
+          <div class="campo" data-field="transborda">
+            <label>Transbordas (cambias de transporte) en el camino?</label>
+            <div class="opciones">
+              <label class="opcion"><input type="radio" name="transborda" value="no" checked />
+                <span class="txt">No</span></label>
+              <label class="opcion"><input type="radio" name="transborda" value="si" />
+                <span class="txt">Si</span></label>
+            </div>
+          </div>
+
+          <!-- 2) Primer transporte -->
+          <div class="campo" data-field="parada_camion">
+            <label>Donde tomas el primer transporte</label>
+            <div class="ayuda">Coloca un pin en el punto donde abordas. Arrastralo para ajustar.</div>
+            <div class="mapa-box">
+              <div class="mapa-buscar">
+                <input type="search" id="buscarParada" placeholder="Buscar lugar..." />
+                <button type="button" class="btn-mini" id="btnBuscarParada">Buscar</button>
+              </div>
+              <div class="mapa" id="mapaParada"></div>
+              <div class="mapa-coords" id="coordsParada">Sin ubicacion marcada.</div>
+            </div>
+            <div class="msg-error">Marca en el mapa donde tomas el primer transporte.</div>
+          </div>
+
+          <!-- 3) Segundo transporte (solo si transborda) -->
+          <div id="bloqueSegunda" class="oculto">
+            <div class="campo" data-field="segunda_parada">
+              <label>Donde tomas el segundo transporte</label>
+              <div class="ayuda">Coloca el pin lo mas <strong>exacto</strong> posible en el punto donde tomas el segundo transporte.</div>
+              <div class="mapa-box">
+                <div class="mapa-buscar">
+                  <input type="search" id="buscarSegunda" placeholder="Buscar lugar..." />
+                  <button type="button" class="btn-mini" id="btnBuscarSegunda">Buscar</button>
+                </div>
+                <div class="mapa" id="mapaSegunda"></div>
+                <div class="mapa-coords" id="coordsSegunda">Sin ubicacion marcada.</div>
+              </div>
+              <div class="msg-error">Marca donde tomas el segundo transporte.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="campo" data-field="usaria_ruta_oficial">
+          <label>Usarias la ruta oficial de transporte universitario si existiera con un horario similar al tuyo?</label>
+          <div class="opciones">
+            <label class="opcion"><input type="radio" name="usaria_ruta_oficial" value="si" />
+              <span class="txt">Si</span></label>
+            <label class="opcion"><input type="radio" name="usaria_ruta_oficial" value="no" />
+              <span class="txt">No</span></label>
+            <label class="opcion"><input type="radio" name="usaria_ruta_oficial" value="tal_vez" />
+              <span class="txt">Tal vez</span></label>
+          </div>
+        </div>
+
+        </div><!-- /#bloqueLlegada -->
+
+        <div class="acciones">
+          <button type="button" class="btn btn-sec" data-prev>Atras</button>
+          <button type="button" class="btn btn-primario" data-next id="btnContinuar2">Continuar</button>
+          <button type="button" class="btn btn-primario oculto" id="btnEnviarCarro">Enviar respuesta</button>
+        </div>
+      </section>
+
+      <!-- ============ PASO 3: SALIDAS ============ -->
+      <section class="paso" data-paso="3">
+        <h2>Horarios de salida (lunes a viernes)</h2>
+        <p class="subtitulo">Selecciona tu hora de salida cada dia. Si no tienes clases ese dia, marca "No aplica".</p>
+        <div id="diasContenedor"></div>
+        <div class="acciones">
+          <button type="button" class="btn btn-sec" data-prev>Atras</button>
+          <button type="button" class="btn btn-primario" data-next>Revisar</button>
+        </div>
+      </section>
+
+      <!-- ============ PASO 4: CONFIRMACION ============ -->
+      <section class="paso" data-paso="4">
+        <h2>Confirma tus respuestas</h2>
+        <p class="subtitulo">Revisa que todo este correcto antes de enviar.</p>
+        <div id="resumen"></div>
+        <div class="acciones">
+          <button type="button" class="btn btn-sec" data-prev>Atras</button>
+          <button type="submit" class="btn btn-primario" id="btnEnviar">Confirmar y enviar</button>
+        </div>
+      </section>
+    </form>
+
+    <!-- ============ GRACIAS ============ -->
+    <section class="paso" data-paso="5">
+      <div class="gracias">
+        <div class="check">&#10003;</div>
+        <h2>Gracias por participar</h2>
+        <p>Tu respuesta fue registrada correctamente. Con esta informacion disenaremos la ruta oficial de transporte de la UTBB.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="/static/js/encuesta.js"></script>
+</body>
+</html>
