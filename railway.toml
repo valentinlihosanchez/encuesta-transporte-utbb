@@ -2,7 +2,8 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "npm run migrate && npm run seed:admin && node src/server.js"
+preDeployCommand = "npm run migrate && npm run seed:admin"
+startCommand = "node src/server.js"
 healthcheckPath = "/"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
