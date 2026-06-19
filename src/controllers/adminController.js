@@ -205,13 +205,15 @@ async function dashboardData(req, res, next) {
   try {
     const totalEst = (await query('SELECT COUNT(*)::int c FROM estudiantes')).rows[0].c;
 
-    // La hora de entrada ahora es por dia; agregamos todas las horas de la semana.
-    const horasEntrada = (
+    const entradasPorDia = (
       await query(
-        `SELECT to_char(hora_entrada,'HH24:MI') AS hora, COUNT(*)::int AS n
+        `SELECT dia_semana,
+                CASE WHEN no_aplica THEN 'no_aplica'
+                     ELSE to_char(hora_entrada,'HH24:MI') END AS hora,
+                COUNT(*)::int AS n
            FROM horarios_entrada
-          WHERE no_aplica = FALSE AND hora_entrada IS NOT NULL
-          GROUP BY hora ORDER BY hora`
+           GROUP BY dia_semana, hora
+           ORDER BY dia_semana, hora`
       )
     ).rows;
 
@@ -250,7 +252,7 @@ async function dashboardData(req, res, next) {
 
     res.json({
       total_estudiantes: totalEst,
-      horas_entrada: horasEntrada,
+      entradas_por_dia: entradasPorDia,
       medios,
       salidas_por_dia: salidasPorDia,
       transbordos,

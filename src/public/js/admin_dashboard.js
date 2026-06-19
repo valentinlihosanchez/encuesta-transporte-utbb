@@ -25,9 +25,8 @@
     var rutaSi = (d.usaria_ruta.find(function (r) { return r.r === 'si'; }) || { n: 0 }).n;
     document.getElementById('kpiRutaSi').textContent = rutaSi;
 
-    // Horas de entrada (barras)
-    barra('chHoras', d.horas_entrada.map(function (h) { return h.hora; }),
-      d.horas_entrada.map(function (h) { return h.n; }), 'Estudiantes', VERDE);
+    // Horas de entrada por dia (barras apiladas igual que salidas)
+    entradasPorDia(d);
 
     // Medios (dona)
     var medioLabel = { camion: 'Camion', carro_personal: 'Carro personal', otro: 'Otro' };
@@ -61,6 +60,36 @@
       type: 'doughnut',
       data: { labels: labels, datasets: [{ data: datos, backgroundColor: PALETA }] },
       options: { responsive: true, plugins: { legend: { position: 'bottom' } } },
+    });
+  }
+
+  function entradasPorDia(d) {
+    var dias = d.dias_semana;
+    var horasSet = {};
+    d.entradas_por_dia.forEach(function (r) { horasSet[r.hora] = true; });
+    var horas = Object.keys(horasSet).sort(function (a, b) {
+      if (a === 'no_aplica') return 1;
+      if (b === 'no_aplica') return -1;
+      return a < b ? -1 : 1;
+    });
+    var datasets = horas.map(function (hora, i) {
+      return {
+        label: hora === 'no_aplica' ? 'No aplica' : hora,
+        data: dias.map(function (dia) {
+          var f = d.entradas_por_dia.find(function (r) { return r.dia_semana === dia && r.hora === hora; });
+          return f ? f.n : 0;
+        }),
+        backgroundColor: hora === 'no_aplica' ? '#cfd8dc' : PALETA[i % PALETA.length],
+      };
+    });
+    new Chart(document.getElementById('chEntradas'), {
+      type: 'bar',
+      data: { labels: dias.map(function (x) { return DIA_LABEL[x] || x; }), datasets: datasets },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom' } },
+        scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } } },
+      },
     });
   }
 
