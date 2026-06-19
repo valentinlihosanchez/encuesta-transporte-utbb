@@ -38,7 +38,7 @@ const CARRERAS = {
     'Gastronomia',
     'Terapia Fisica',
     'Negocios y Mercadotecnia',
-    'Contaduria',
+    'Contaduria SIUUU',
     'Medico Cirujano y Partero',
   ],
   Ingenierias: [
