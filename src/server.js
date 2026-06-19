@@ -38,6 +38,10 @@ app.get('/favicon.svg', (req, res) => {
   res.type('image/svg+xml').send(FAVICON);
 });
 
+// Railway (y cualquier hosting con proxy) requiere esto para que las
+// cookies secure funcionen correctamente detras del load balancer.
+app.set('trust proxy', 1);
+
 // ---- Sesion (para el panel admin) ----
 app.use(
   session({
