@@ -277,6 +277,34 @@ async function mapa(req, res, next) {
   }
 }
 
+async function mapaZonas(req, res, next) {
+  try {
+    const { rows } = await query(
+      `SELECT
+         t.vive_direccion                          AS zona,
+         COUNT(*)::int                             AS total,
+         AVG(t.vive_lat)                           AS lat,
+         AVG(t.vive_lng)                           AS lng,
+         json_agg(json_build_object(
+           'id',        e.id,
+           'nombre',    e.nombre_completo,
+           'matricula', e.matricula,
+           'carrera',   e.carrera
+         ) ORDER BY e.nombre_completo)             AS estudiantes
+       FROM transporte_entrada t
+       JOIN estudiantes e ON e.id = t.estudiante_id
+      WHERE t.vive_direccion IS NOT NULL
+        AND length(trim(t.vive_direccion)) > 0
+        AND t.vive_lat IS NOT NULL
+      GROUP BY t.vive_direccion
+      ORDER BY total DESC`
+    );
+    res.json({ zonas: rows });
+  } catch (err) {
+    next(err);
+  }
+}
+
 async function mapaData(req, res, next) {
   try {
     const puntos = (
@@ -399,6 +427,7 @@ module.exports = {
   dashboardData,
   mapa,
   mapaData,
+  mapaZonas,
   exportarCsv,
   eliminar,
 };

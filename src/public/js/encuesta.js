@@ -53,8 +53,23 @@
           o.value = c;
           dl.appendChild(o);
         });
+        // Si el usuario escribe algo que no esta en la lista, lo agrega
+        // al datalist en tiempo real para que aparezca como sugerencia.
+        var input = $('#vive_direccion');
+        input.addEventListener('input', function () {
+          var val = (input.value || '').trim();
+          if (!val) return;
+          var existe = Array.from(dl.options).some(function (o) {
+            return o.value.toLowerCase() === val.toLowerCase();
+          });
+          if (!existe) {
+            var opt = document.createElement('option');
+            opt.value = val;
+            dl.appendChild(opt);
+          }
+        });
       })
-      .catch(function () { /* si falla, el campo sigue siendo texto libre */ });
+      .catch(function () { });
   }
 
   // Paso 2: hora de entrada por dia (lun-vie) con barra vertical ancha, con

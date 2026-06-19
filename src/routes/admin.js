@@ -5,6 +5,7 @@ const rateLimit = require('express-rate-limit');
 const { requireAuth } = require('../middlewares/auth');
 const c = require('../controllers/adminController');
 
+
 const router = express.Router();
 
 // Rate-limit al login para frenar fuerza bruta.
@@ -32,6 +33,7 @@ router.get('/dashboard', c.dashboard);
 router.get('/dashboard/data.json', c.dashboardData);
 router.get('/mapa', c.mapa);
 router.get('/mapa/data.json', c.mapaData);
+router.get('/mapa/zonas.json', c.mapaZonas);
 router.get('/export.csv', c.exportarCsv);
 router.delete('/estudiante/:id', c.eliminar);
 
