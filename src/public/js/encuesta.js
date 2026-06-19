@@ -53,21 +53,46 @@
           o.value = c;
           dl.appendChild(o);
         });
-        // Si el usuario escribe algo que no esta en la lista, lo agrega
-        // al datalist en tiempo real para que aparezca como sugerencia.
+        // Al elegir una opcion de la lista -> busca y centra el mapa de domicilio.
         var input = $('#vive_direccion');
-        input.addEventListener('input', function () {
+        input.addEventListener('change', function () {
           var val = (input.value || '').trim();
           if (!val) return;
+          buscarDireccion(val, 'domicilio');
+        });
+      })
+      .catch(function () { });
+  }
+
+  // Geocodificacion inversa: dado un lat/lng, obtiene el nombre de la zona
+  // y lo pone en el input vive_direccion (solo para el mapa de domicilio).
+  function geocodificarInverso(lat, lng) {
+    var url = 'https://nominatim.openstreetmap.org/reverse?format=json&zoom=14' +
+      '&lat=' + lat + '&lon=' + lng + '&accept-language=es';
+    fetch(url, { headers: { 'User-Agent': 'EncuestaUTBB/1.0' } })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d || !d.address) return;
+        var a = d.address;
+        // Preferencia: barrio, colonia, suburbio, municipio.
+        var zona = a.neighbourhood || a.suburb || a.quarter ||
+                   a.village || a.town || a.city_district || a.county || '';
+        if (!zona) return;
+        var input = $('#vive_direccion');
+        // Solo rellenar si el campo esta vacio o tiene el valor anterior del pin.
+        input.value = zona;
+        // Agregar al datalist si no existe.
+        var dl = $('#listaColonias');
+        if (dl) {
           var existe = Array.from(dl.options).some(function (o) {
-            return o.value.toLowerCase() === val.toLowerCase();
+            return o.value.toLowerCase() === zona.toLowerCase();
           });
           if (!existe) {
             var opt = document.createElement('option');
-            opt.value = val;
+            opt.value = zona;
             dl.appendChild(opt);
           }
-        });
+        }
       })
       .catch(function () { });
   }
@@ -431,11 +456,13 @@
         marker.on('dragend', function (e) {
           var p = e.target.getLatLng();
           guardarUbic(key, p.lat, p.lng, coordsId);
+          if (key === 'domicilio') geocodificarInverso(p.lat, p.lng);
         });
       } else {
         marker.setLatLng(latlng);
       }
       guardarUbic(key, latlng.lat, latlng.lng, coordsId);
+      if (key === 'domicilio') geocodificarInverso(latlng.lat, latlng.lng);
     }
 
     map.on('click', function (e) { setPin(e.latlng); });
